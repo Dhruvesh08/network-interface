@@ -38,6 +38,9 @@ async fn main() -> Result<(), ()> {
         }
     }
 
+    let mac_address = get_mac_address(&link).expect("could not get mac address");
+    println!("The MAC address of eth0 is: {}", mac_address);
+
     Ok(())
 }
 
@@ -106,4 +109,14 @@ async fn get_address_of_link(handle: Handle, link: String) -> Result<Vec<Address
         eprintln!("link {link} not found");
         Ok(Vec::new())
     }
+}
+
+fn get_mac_address(interface_name: &str) -> ifcfg::Result<String> {
+    let ifaces = ifcfg::IfCfg::get().expect("could not get interfaces");
+    let mac_address = &ifaces
+        .iter()
+        .find(|iface| iface.name == interface_name)
+        .unwrap()
+        .mac;
+    Ok(mac_address.to_string())
 }
